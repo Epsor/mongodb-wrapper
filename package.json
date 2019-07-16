@@ -8,6 +8,7 @@
     "prepare": "npm run build",
     "build": "babel src -d dist --ignore 'src/**/*.test.js'",
     "test": "NODE_ENV=test jest --coverage",
+    "start": "babel src -d dist --watch",
     "clean": "rm -rf dist"
   },
   "author": "Epsor",
