@@ -83,4 +83,8 @@ export default class MongoCollectionWrapper {
   find(...args) {
     return this.collection.find(...args);
   }
+
+  findOne(...args) {
+    return this.collection.findOne(...args);
+  }
 }

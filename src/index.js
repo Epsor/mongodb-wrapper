@@ -1,4 +1,4 @@
 import MongoWrapper from './mongoWrapper';
 
-export default new MongoWrapper();
+export default MongoWrapper;
 export * from './mongoError';
