@@ -1,6 +1,9 @@
 // eslint-disable-next-line no-unused-vars
 import { MongoClient, Db, Collection, ClientSession, CommandCursor } from 'mongodb';
 
+import MongoCollectionWrapper from './mongoCollectionWrapper';
+import MongoError from './mongoError';
+
 /**
  * Mongo DB wrapper. Easier mock and tests (test with `@shelf/jest-mongodb`)
  *
@@ -17,7 +20,7 @@ export default class MongoWrapper {
 
   async connect(mongoDbUrl, db) {
     if (this.connected) {
-      throw new Error('Already connected.');
+      throw new MongoError('Already connected.');
     }
 
     this.connection = await MongoClient.connect(mongoDbUrl, { useNewUrlParser: true });
@@ -29,7 +32,7 @@ export default class MongoWrapper {
 
   async disconnect() {
     if (!this.connected) {
-      throw new Error('Not connected.');
+      throw new MongoError('Not connected.');
     }
 
     await this.connection.close();
@@ -41,27 +44,14 @@ export default class MongoWrapper {
   }
 
   /**
-   * Fetch a specific collection (containing the actual collection information). If the application does not use strict mode you
-   * can use it without a callback in the following way: `const collection = db.collection('mycollection');`
+   * Get access to a specific Mongo collection
    *
    * @method
-   * @param {String} name the collection name we wish to access.
-   * @param {Object} [options] Optional settings.
-   * @param {(number|string)} [options.w] The write concern.
-   * @param {Number} [options.wtimeout] The write concern timeout.
-   * @param {Boolean} [options.j=false] Specify a journal write concern.
-   * @param {Boolean} [options.raw=false] Return document results as raw BSON buffers.
-   * @param {Object} [options.pkFactory] A primary key factory object for generation of custom _id keys.
-   * @param {(ReadPreference|string)} [options.readPreference] The preferred read preference (ReadPreference.PRIMARY, ReadPreference.PRIMARY_PREFERRED, ReadPreference.SECONDARY, ReadPreference.SECONDARY_PREFERRED, ReadPreference.NEAREST).
-   * @param {Boolean} [options.serializeFunctions=false] Serialize functions on any object.
-   * @param {Boolean} [options.strict=false] Returns an error if the collection does not exist
-   * @param {Object} [options.readConcern] Specify a read concern for the collection. (only MongoDB 3.2 or higher supported)
-   * @param {Object} [options.readConcern.level='local'] Specify a read concern level for the collection operations, one of [local|majority]. (only MongoDB 3.2 or higher supported)
-   * @param {Db~collectionResultCallback} [callback] The collection result callback
-   * @return {Collection} return the new Collection instance if not in strict mode
+   * @param {String} collectionName the collection name we wish to access.
+   * @return {MongoCollectionWrapper} return the new Collection instance
    */
-  collection(...args) {
-    return this.db.collection(...args);
+  collection(collectionName) {
+    return new MongoCollectionWrapper(this.db, collectionName);
   }
 
   /**
@@ -142,5 +132,18 @@ export default class MongoWrapper {
    */
   createCollection(...args) {
     return this.db.createCollection(...args);
+  }
+
+  /**
+   * Fetch all collections for the current db.
+   *
+   * @method
+   * @param {Object} [options] Optional settings
+   * @param {ClientSession} [options.session] optional session to use for this operation
+   * @param {Db~collectionsResultCallback} [callback] The results callback
+   * @return {Promise} returns Promise if no callback passed
+   */
+  collections(...args) {
+    return this.db.collections(...args);
   }
 }

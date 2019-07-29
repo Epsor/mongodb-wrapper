@@ -84,7 +84,14 @@ describe('mongoWrapper', () => {
     });
   });
 
-  ['collection', 'dropCollection', 'listCollections', 'stats', 'createCollection'].forEach(fn =>
+  [
+    'collection',
+    'collections',
+    'dropCollection',
+    'listCollections',
+    'stats',
+    'createCollection',
+  ].forEach(fn =>
     describe(fn, () => {
       it(`should call ${fn} with same arguments`, async () => {
         const mock = jest.fn();
