@@ -169,6 +169,22 @@ describe('mongoCollectionWrapper', () => {
     });
   });
 
+  describe('findOne', () => {
+    it('should findOne a mocked value', async () => {
+      const data = [{ uuid: 'aaa', name: 'foo' }, { uuid: 'bbb', name: 'bar' }];
+      const clientMock = {
+        collection: jest.fn(() => ({
+          findOne: jest.fn(() => data[0]),
+        })),
+      };
+
+      const collection = await new MongoCollectionWrapper(clientMock, 'test');
+      const result = await collection.findOne({ uuid: 'aaa' });
+
+      expect(result).toEqual(data[0]);
+    });
+  });
+
   describe('insertMany', () => {
     it('should insert a many mocked values', async () => {
       const data = [{ uuid: 'aaa', name: 'foo' }, { uuid: 'bbb', name: 'bar' }];
