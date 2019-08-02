@@ -67,11 +67,12 @@ export default class MongoCollectionWrapper {
   /**
    * Delete a document from the Mongo collection
    *
-   * @param {String} uuid - UUID of the document that needs to be deleted
+   * @param {Object} fields -The fields used for deletion
+   * @param {String} fields.uuid - UUID of the document that needs to be deleted
    * @returns {Promise} - Promise of deletion
    */
-  async deleteOne(uuid) {
-    const { value } = await this.collection.findOneAndDelete({ uuid });
+  async deleteOne(fields) {
+    const { value } = await this.collection.findOneAndDelete(fields);
     if (!value) {
       throw new MongoNonExistentEntryError(
         `Cannot delete ${this.collectionName}: UUID doesn't exists.`,

@@ -131,7 +131,7 @@ describe('mongoCollectionWrapper', () => {
       };
 
       const collection = await new MongoCollectionWrapper(clientMock, 'test');
-      await collection.deleteOne(document.uuid, { foo: document.foo });
+      await collection.deleteOne({ uuid: document.uuid }, { foo: document.foo });
 
       expect(findOneAndDeleteMock).toHaveBeenCalledTimes(1);
     });
@@ -146,7 +146,7 @@ describe('mongoCollectionWrapper', () => {
       };
       const deleteAction = async () => {
         const collection = await new MongoCollectionWrapper(clientMock, 'test');
-        await collection.deleteOne();
+        await collection.deleteOne({ uuid: '1232412412' });
       };
 
       expect(deleteAction()).rejects.toThrow(MongoNonExistentEntryError);
