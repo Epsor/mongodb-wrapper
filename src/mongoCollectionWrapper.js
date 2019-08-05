@@ -29,8 +29,8 @@ export default class MongoCollectionWrapper {
   /**
    * Insert a document into the Mongo collection if the UUID doesn't exist already
    *
-   * @param {String} uuid - UUID of the document that will be inserted
-   * @param {Object} fields - Rest of the document properties
+   * @param {Object} fields - The document properties
+   * @param {String} fields.uuid - UUID of the document that will be inserted
    * @returns {Promise} - Promise of insertion
    */
   async insertOne({ uuid, ...fields }) {
@@ -40,6 +40,7 @@ export default class MongoCollectionWrapper {
         `Cannot insert into ${this.collectionName}: UUID already exists.`,
       );
     }
+
     return this.collection.insertOne({ uuid, ...fields });
   }
 
