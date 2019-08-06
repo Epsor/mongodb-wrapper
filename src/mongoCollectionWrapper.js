@@ -51,12 +51,12 @@ export default class MongoCollectionWrapper {
   /**
    * Update a document into the Mongo collection
    *
-   * @param {String} uuid - UUID of the document that needs to be updated
+   * @param {Object} filters - filters of the document that needs to be updated
    * @param {Object} fields - Document properties
    * @returns {Promise} - Promise of update
    */
-  async updateOne(uuid, fields) {
-    const { value } = await this.collection.findOneAndUpdate({ uuid }, { $set: fields });
+  async updateOne(filters, fields) {
+    const { value } = await this.collection.findOneAndUpdate(filters, { $set: fields });
     if (!value) {
       throw new MongoNonExistentEntryError(
         `Cannot update ${this.collectionName}: UUID doesn't exists.`,
@@ -74,11 +74,26 @@ export default class MongoCollectionWrapper {
    */
   async deleteOne(fields) {
     const { value } = await this.collection.findOneAndDelete(fields);
+
     if (!value) {
       throw new MongoNonExistentEntryError(
         `Cannot delete ${this.collectionName}: UUID doesn't exists.`,
       );
     }
+
+    return value;
+  }
+
+  /**
+   * Delete documents from the Mongo collection
+   *
+   * @param {Object} fields -The fields used for deletion
+   * @param {String} fields.uuid - UUID of the document that needs to be deleted
+   * @returns {Promise} - Promise of deletion
+   */
+  async deleteMany(fields) {
+    const { value } = await this.collection.findAndRemove(fields);
+
     return value;
   }
 
