@@ -1,5 +1,6 @@
 import { MongoClient } from 'mongodb';
 
+import { MongoError } from '../mongoError';
 import MongoWrapper from '../mongoWrapper';
 
 describe('mongoWrapper', () => {
@@ -27,8 +28,11 @@ describe('mongoWrapper', () => {
   describe('connect', () => {
     it('should throw if allready connected', async () => {
       const mongoInstance = new MongoWrapper();
+
       await mongoInstance.connect('a', 'b');
-      expect(mongoInstance.connect('a', 'b')).rejects.toThrow(/Already connected/);
+      await expect(mongoInstance.connect('a', 'b')).rejects.toEqual(
+        new MongoError('Already connected.'),
+      );
     });
 
     it('should call MongoClient.connect with good params', async () => {

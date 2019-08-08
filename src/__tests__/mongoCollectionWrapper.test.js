@@ -170,22 +170,6 @@ describe('mongoCollectionWrapper', () => {
 
       expect(findAndRemoveMock).toHaveBeenCalledTimes(1);
     });
-
-    it('should throw an error when deleting a dysfunctional UUID', async () => {
-      const clientMock = {
-        collection: jest.fn(() => ({
-          findAndRemove: jest.fn(() => ({
-            value: null,
-          })),
-        })),
-      };
-      const deleteAction = async () => {
-        const collection = await new MongoCollectionWrapper(clientMock, 'test');
-        await collection.deleteMany({ uuid: '1232412412' });
-      };
-
-      expect(deleteAction()).rejects.toThrow(MongoNonExistentEntryError);
-    });
   });
 
   describe('find', () => {

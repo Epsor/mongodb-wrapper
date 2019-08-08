@@ -2,7 +2,7 @@
 import { MongoClient, Db, Collection, ClientSession, CommandCursor } from 'mongodb';
 
 import MongoCollectionWrapper from './mongoCollectionWrapper';
-import MongoError from './mongoError';
+import { MongoError } from './mongoError';
 
 /**
  * Mongo DB wrapper. Easier mock and tests (test with `@shelf/jest-mongodb`)
@@ -20,7 +20,7 @@ export default class MongoWrapper {
 
   async connect(mongoDbUrl, db) {
     if (this.connected) {
-      throw new MongoError('Already connected.');
+      return Promise.reject(new MongoError('Already connected.'));
     }
 
     this.connection = await MongoClient.connect(mongoDbUrl, { useNewUrlParser: true });
