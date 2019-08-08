@@ -53,10 +53,11 @@ export default class MongoCollectionWrapper {
    *
    * @param {Object} filters - filters of the document that needs to be updated
    * @param {Object} fields - Document properties
+   * @param {String} strategy - Update stategy. default = "$set"
    * @returns {Promise} - Promise of update
    */
-  async updateOne(filters, fields) {
-    const { value } = await this.collection.findOneAndUpdate(filters, { $set: fields });
+  async updateOne(filters, fields, stategy = '$set') {
+    const { value } = await this.collection.findOneAndUpdate(filters, { [stategy]: fields });
     if (!value) {
       throw new MongoNonExistentEntryError(
         `Cannot update ${this.collectionName}: UUID doesn't exists.`,
