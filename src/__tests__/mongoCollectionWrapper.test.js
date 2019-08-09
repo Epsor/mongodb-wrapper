@@ -101,6 +101,25 @@ describe('mongoCollectionWrapper', () => {
       expect(findOneAndUpdateMock).toHaveBeenCalledTimes(1);
     });
 
+    describe('updateMany', () => {
+      it('should update a document', async () => {
+        const document = { uuid: 'aaa', foo: 'bar' };
+        const updateMany = jest.fn(() => ({
+          value: document,
+        }));
+        const clientMock = {
+          collection: jest.fn(() => ({
+            updateMany,
+          })),
+        };
+
+        const collection = await new MongoCollectionWrapper(clientMock, 'test');
+        await collection.updateMany(document.uuid, { foo: document.foo });
+
+        expect(updateMany).toHaveBeenCalledTimes(1);
+      });
+    });
+
     it('should throw an error when updating a dysfunctional UUID', async () => {
       const clientMock = {
         collection: jest.fn(() => ({

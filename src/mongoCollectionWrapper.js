@@ -67,6 +67,20 @@ export default class MongoCollectionWrapper {
   }
 
   /**
+   * Update documents into the Mongo collection
+   *
+   * @param {Object} filters - filters of the document that needs to be updated
+   * @param {Object} fields - Document properties
+   * @param {String} strategy - Update stategy. default = "$set"
+   * @returns {Promise} - Promise of update
+   */
+  async updateMany(filters, fields, stategy = '$set') {
+    const { value } = await this.collection.updateMany(filters, { [stategy]: fields });
+
+    return value;
+  }
+
+  /**
    * Delete a document from the Mongo collection
    *
    * @param {Object} fields -The fields used for deletion
