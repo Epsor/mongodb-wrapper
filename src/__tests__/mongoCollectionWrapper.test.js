@@ -204,6 +204,21 @@ describe('mongoCollectionWrapper', () => {
     });
   });
 
+  describe('countDocuments', () => {
+    it('should countDocuments a mocked value', async () => {
+      const clientMock = {
+        collection: jest.fn(() => ({
+          countDocuments: jest.fn(() => Promise.resolve(42)),
+        })),
+      };
+
+      const collection = await new MongoCollectionWrapper(clientMock, 'test');
+      const result = await collection.countDocuments({ uuid: 'aaa' });
+
+      expect(result).toEqual(42);
+    });
+  });
+
   describe('insertMany', () => {
     it('should insert a many mocked values', async () => {
       const data = [{ uuid: 'aaa', name: 'foo' }, { uuid: 'bbb', name: 'bar' }];

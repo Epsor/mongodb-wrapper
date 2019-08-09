@@ -105,4 +105,8 @@ export default class MongoCollectionWrapper {
   findOne(...args) {
     return this.collection.findOne(...args);
   }
+
+  countDocuments(...args) {
+    return this.collection.countDocuments(...args);
+  }
 }
