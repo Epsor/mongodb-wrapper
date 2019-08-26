@@ -23,7 +23,10 @@ export default class MongoWrapper {
       return Promise.reject(new MongoError('Already connected.'));
     }
 
-    this.connection = await MongoClient.connect(mongoDbUrl, { useNewUrlParser: true });
+    this.connection = await MongoClient.connect(mongoDbUrl, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
     this.db = this.connection.db(db);
     this.connected = true;
 
