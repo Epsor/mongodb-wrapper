@@ -238,6 +238,28 @@ describe('mongoCollectionWrapper', () => {
     });
   });
 
+  describe('startSession', () => {
+    it('should start a session', async () => {
+      const value = { withTransaction: () => {} };
+      const clientMock = {
+        collection: jest.fn(() => ({
+          startSession: jest.fn(() => Promise.resolve(value)),
+        })),
+      };
+
+      const collection = await new MongoCollectionWrapper(clientMock, 'test');
+      const result = await collection.startSession({
+        defaultTransactionOptions: {
+          readConcern: { level: 'local' },
+          writeConcern: { w: 'majority' },
+          readPreference: 'primary',
+        },
+      });
+
+      expect(result).toEqual(value);
+    });
+  });
+
   describe('insertMany', () => {
     it('should insert a many mocked values', async () => {
       const data = [{ uuid: 'aaa', name: 'foo' }, { uuid: 'bbb', name: 'bar' }];
