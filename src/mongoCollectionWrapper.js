@@ -123,4 +123,8 @@ export default class MongoCollectionWrapper {
   countDocuments(...args) {
     return this.collection.countDocuments(...args);
   }
+
+  startSession(...args) {
+    return this.collection.startSession(...args);
+  }
 }
