@@ -238,28 +238,6 @@ describe('mongoCollectionWrapper', () => {
     });
   });
 
-  describe('startSession', () => {
-    it('should start a session', async () => {
-      const value = { withTransaction: () => {} };
-      const clientMock = {
-        collection: jest.fn(() => ({
-          startSession: jest.fn(() => Promise.resolve(value)),
-        })),
-      };
-
-      const collection = await new MongoCollectionWrapper(clientMock, 'test');
-      const result = await collection.startSession({
-        defaultTransactionOptions: {
-          readConcern: { level: 'local' },
-          writeConcern: { w: 'majority' },
-          readPreference: 'primary',
-        },
-      });
-
-      expect(result).toEqual(value);
-    });
-  });
-
   describe('insertMany', () => {
     it('should insert a many mocked values', async () => {
       const data = [{ uuid: 'aaa', name: 'foo' }, { uuid: 'bbb', name: 'bar' }];
@@ -275,4 +253,56 @@ describe('mongoCollectionWrapper', () => {
       expect(result).toEqual(data);
     });
   });
+
+  [
+    'aggregate',
+    'findOneAndUpdate',
+    'findOneAndDelete',
+    'stats',
+    'indexes',
+    'createIndex',
+    'dropIndex',
+    'listIndexes',
+    'indexInformation',
+    'countDocuments',
+    'find',
+    'insertMany',
+    'bulkWrite',
+    'replaceOne',
+    'findOne',
+    'rename',
+    'drop',
+    'options',
+    'isCapped',
+    'createIndexes',
+    'dropIndexes',
+    'reIndex',
+    'indexExists',
+    'estimatedDocumentCount',
+    'distinct',
+    'findOneAndReplace',
+    'watch',
+    'parallelCollectionScan',
+    'geoHaystackSearch',
+    'initializeUnorderedBulkOp',
+    'initializeOrderedBulkOp',
+  ].forEach(fn =>
+    describe(fn, () => {
+      it(`should call ${fn} with same arguments`, async () => {
+        const mock = jest.fn();
+        const client = await new MongoCollectionWrapper(
+          {
+            collection: () => ({
+              [fn]: mock,
+            }),
+          },
+          'test',
+        );
+
+        expect(mock).toHaveBeenCalledTimes(0);
+        client[fn]('aplfa', 'beta', 'charly');
+        expect(mock).toHaveBeenCalledTimes(1);
+      });
+    }),
+  );
 });
