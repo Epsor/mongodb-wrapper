@@ -60,6 +60,7 @@ describe('mongoCollectionWrapper', () => {
       };
 
       const collection = await new MongoCollectionWrapper(clientMock, 'test');
+
       await collection.insertOne(document);
 
       expect(toArrayMock).toHaveBeenCalledTimes(1);
@@ -77,8 +78,10 @@ describe('mongoCollectionWrapper', () => {
       };
       const insert = async () => {
         const collection = await new MongoCollectionWrapper(clientMock, 'test');
+
         await collection.insertOne(document);
       };
+
       expect(insert()).rejects.toThrow(MongoDuplicateEntryError);
     });
   });
@@ -96,6 +99,7 @@ describe('mongoCollectionWrapper', () => {
       };
 
       const collection = await new MongoCollectionWrapper(clientMock, 'test');
+
       await collection.updateOne(document.uuid, { foo: document.foo });
 
       expect(findOneAndUpdateMock).toHaveBeenCalledTimes(1);
@@ -114,6 +118,7 @@ describe('mongoCollectionWrapper', () => {
         };
 
         const collection = await new MongoCollectionWrapper(clientMock, 'test');
+
         await collection.updateMany(document.uuid, { foo: document.foo });
 
         expect(updateMany).toHaveBeenCalledTimes(1);
@@ -130,6 +135,7 @@ describe('mongoCollectionWrapper', () => {
       };
       const update = async () => {
         const collection = await new MongoCollectionWrapper(clientMock, 'test');
+
         await collection.updateOne();
       };
 
@@ -150,6 +156,7 @@ describe('mongoCollectionWrapper', () => {
       };
 
       const collection = await new MongoCollectionWrapper(clientMock, 'test');
+
       await collection.deleteOne({ uuid: document.uuid }, { foo: document.foo });
 
       expect(findOneAndDeleteMock).toHaveBeenCalledTimes(1);
@@ -165,6 +172,7 @@ describe('mongoCollectionWrapper', () => {
       };
       const deleteAction = async () => {
         const collection = await new MongoCollectionWrapper(clientMock, 'test');
+
         await collection.deleteOne({ uuid: '1232412412' });
       };
 
@@ -185,6 +193,7 @@ describe('mongoCollectionWrapper', () => {
       };
 
       const collection = await new MongoCollectionWrapper(clientMock, 'test');
+
       await collection.deleteMany({ uuid: document.uuid }, { foo: document.foo });
 
       expect(findAndRemoveMock).toHaveBeenCalledTimes(1);
