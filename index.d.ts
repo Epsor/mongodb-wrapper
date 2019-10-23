@@ -2,6 +2,8 @@
 import { Db } from 'mongodb';
 
 export default class MongoWrapper extends Db {
+  constructor();
+
   connect(mongoDbUrl: string, db: string): Promise<this>;
 
   disconnect(): Promise<this>;
