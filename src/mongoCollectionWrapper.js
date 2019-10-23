@@ -15,7 +15,7 @@ export default class MongoCollectionWrapper {
     if (!collectionName) {
       throw new MongoError('Collection name is not provided.');
     }
-    return new Promise(async (resolve, reject) => {
+    const promise = async (resolve, reject) => {
       try {
         this.collection = await mongoClient.collection(collectionName, ...args);
         this.collectionName = collectionName;
@@ -23,7 +23,9 @@ export default class MongoCollectionWrapper {
         return reject(err);
       }
       return resolve(this);
-    });
+    };
+
+    return new Promise(promise);
   }
 
   /**
@@ -35,6 +37,7 @@ export default class MongoCollectionWrapper {
    */
   async insertOne({ uuid, ...fields }) {
     const existingDocument = await this.collection.find({ uuid }).toArray();
+
     if (existingDocument.length) {
       throw new MongoDuplicateEntryError(
         `Cannot insert into ${this.collectionName}: UUID already exists.`,
@@ -54,6 +57,7 @@ export default class MongoCollectionWrapper {
    */
   async updateOne(filters, fields, stategy = '$set') {
     const { value } = await this.collection.findOneAndUpdate(filters, { [stategy]: fields });
+
     if (!value) {
       throw new MongoNonExistentEntryError(
         `Cannot update ${this.collectionName}: UUID doesn't exists.`,
