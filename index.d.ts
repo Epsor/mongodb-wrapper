@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-empty-interface */
 import { Db } from 'mongodb';
 
-export default interface MongoWrapper extends Db {
+export default class MongoWrapper extends Db {
   connect(mongoDbUrl: string, db: string): Promise<this>;
+
   disconnect(): Promise<this>;
 }
 
