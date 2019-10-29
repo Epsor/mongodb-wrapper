@@ -29,7 +29,7 @@ describe('mongoWrapper', () => {
   });
 
   describe('connect', () => {
-    it('should throw if allready connected', async () => {
+    it('should throw if already connected', async () => {
       const mongoInstance = new MongoWrapper();
 
       await mongoInstance.connect('a', 'b');
@@ -46,17 +46,40 @@ describe('mongoWrapper', () => {
       expect(MongoClient.connect).toHaveBeenCalledWith('aaa', expect.any(Object));
     });
 
-    it('should user go good db', async () => {
+    it('should handle MongoDb errors', async () => {
       const dbMock = jest.fn();
+      const onMock = jest.fn((event, callback) => {
+        callback(new Error('Server unreachable'));
+      });
 
       MongoClient.connect.mockImplementation(
         jest.fn(() => ({
+          on: onMock,
+          db: dbMock,
+        })),
+      );
+      const mongoInstance = new MongoWrapper();
+
+      await expect(mongoInstance.connect('aaa', 'bbb')).rejects.toThrow(
+        new Error('Server unreachable'),
+      );
+      expect(onMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('should user go good db', async () => {
+      const dbMock = jest.fn();
+      const onMock = jest.fn();
+
+      MongoClient.connect.mockImplementation(
+        jest.fn(() => ({
+          on: onMock,
           db: dbMock,
         })),
       );
       const mongoInstance = new MongoWrapper();
 
       await mongoInstance.connect('aaa', 'bb');
+      expect(onMock).toHaveBeenCalledTimes(1);
       expect(dbMock).toHaveBeenCalledTimes(1);
       expect(dbMock).toHaveBeenCalledWith('bb');
     });
@@ -112,6 +135,7 @@ describe('mongoWrapper', () => {
 
         MongoClient.connect.mockImplementation(
           jest.fn(() => ({
+            on: jest.fn(),
             db: jest.fn(() => ({
               [fn]: mock,
             })),
