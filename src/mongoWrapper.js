@@ -20,13 +20,19 @@ export default class MongoWrapper {
 
   async connect(mongoDbUrl, db) {
     if (this.connected) {
-      return Promise.reject(new MongoError('Already connected.'));
+      throw new MongoError('Already connected.');
     }
 
     this.connection = await MongoClient.connect(mongoDbUrl, {
       useNewUrlParser: true,
-      useUnifiedTopology: true,
+      // useUnifiedTopology is causing timeout issues in some cases so we disable it for now
+      // See https://jira.mongodb.org/browse/NODE-2147 for updates on this issue
+      useUnifiedTopology: false,
     });
+    this.connection.on('error', err => {
+      throw err;
+    });
+
     this.db = this.connection.db(db);
     this.connected = true;
 
