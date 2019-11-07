@@ -10,6 +10,6 @@ export default class MongoWrapper extends Db {
 }
 
 /* Errors */
-export interface MongoError extends Error {}
-export interface MongoDuplicateEntryError extends MongoError {}
-export interface MongoNonExistentEntryError extends MongoError {}
+export class MongoError extends Error {}
+export class MongoDuplicateEntryError extends MongoError {}
+export class MongoNonExistentEntryError extends MongoError {}
