@@ -25,9 +25,7 @@ export default class MongoWrapper {
 
     this.connection = await MongoClient.connect(mongoDbUrl, {
       useNewUrlParser: true,
-      // useUnifiedTopology is causing timeout issues in some cases so we disable it for now
-      // See https://jira.mongodb.org/browse/NODE-2147 for updates on this issue
-      useUnifiedTopology: false,
+      useUnifiedTopology: true,
     });
     this.connection.on('error', err => {
       throw err;
