@@ -55,8 +55,8 @@ export default class MongoCollectionWrapper {
    * @param {String} strategy - Update stategy. default = "$set"
    * @returns {Promise} - Promise of update
    */
-  async updateOne(filters, fields, stategy = '$set') {
-    const { value } = await this.collection.findOneAndUpdate(filters, { [stategy]: fields });
+  async updateOne(filters, fields, strategy = '$set') {
+    const { value } = await this.collection.findOneAndUpdate(filters, { [strategy]: fields });
 
     if (!value) {
       throw new MongoNonExistentEntryError(
@@ -64,6 +64,25 @@ export default class MongoCollectionWrapper {
       );
     }
     return value;
+  }
+
+  /**
+   * Insert subfield in document and looking for duplicate Uuid
+   *
+   * @param {Object} filters - filters of the document that needs to be updated
+   * @param {Object} fields - Document properties
+   * @returns {Promise} - Promise of update
+   */
+  async safeInsertSubfields(filters, fields) {
+    const filter = `${Object.keys(fields)[0]}.uuid`;
+    const existingDocument = await this.collection.find({ [filter]: fields.uuid }).toArray();
+
+    if (existingDocument.length) {
+      throw new MongoDuplicateEntryError(
+        `Cannot insert into ${this.collectionName}: UUID already exists.`,
+      );
+    }
+    await this.updateOne(filters, fields, '$push');
   }
 
   /**
