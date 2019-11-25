@@ -105,6 +105,56 @@ describe('mongoCollectionWrapper', () => {
       expect(findOneAndUpdateMock).toHaveBeenCalledTimes(1);
     });
 
+    describe('safeInsertSubfields', () => {
+      it('should throw an error upon updating and pushing existing UUID', async () => {
+        const document = {
+          uuid: 'aaa',
+          foo: [{ uuid: 'bbb', name: 'bar' }, { uuid: 'ccc', name: 'bar' }],
+        };
+        const clientMock = {
+          collection: jest.fn(() => ({
+            find: jest.fn(() => ({
+              toArray: jest.fn(() => [document]),
+            })),
+            findOneAndUpdate: jest.fn(() => ({
+              value: null,
+            })),
+          })),
+        };
+        const update = async () => {
+          const collection = await new MongoCollectionWrapper(clientMock, 'test');
+
+          await collection.safeInsertSubfields(document, { foo: { uuid: 'bbb', name: 'bar' } });
+        };
+
+        expect(update()).rejects.toThrow(MongoDuplicateEntryError);
+      });
+
+      it('should not throw an error upon updating and pushing non existing UUID', async () => {
+        const document = {
+          uuid: 'aaa',
+          foo: [{ uuid: 'bbb', name: 'bar' }, { uuid: 'ccc', name: 'bar' }],
+        };
+        const clientMock = {
+          collection: jest.fn(() => ({
+            find: jest.fn(() => ({
+              toArray: jest.fn(() => []),
+            })),
+            findOneAndUpdate: jest.fn(() => ({
+              value: null,
+            })),
+          })),
+        };
+        const update = async () => {
+          const collection = await new MongoCollectionWrapper(clientMock, 'test');
+
+          await collection.safeInsertSubfields(document, { foo: { uuid: 'bbb', name: 'bar' } });
+        };
+
+        expect(update()).rejects.toThrow(MongoDuplicateEntryError);
+      });
+    });
+
     describe('updateMany', () => {
       it('should update a document', async () => {
         const document = { uuid: 'aaa', foo: 'bar' };
