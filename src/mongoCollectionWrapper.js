@@ -74,10 +74,14 @@ export default class MongoCollectionWrapper {
    * @returns {Promise} - Promise of update
    */
   async safeInsertSubfields(filters, fields) {
-    const filter = `${Object.keys(fields)[0]}.uuid`;
-    const existingDocument = await this.collection.find({ [filter]: fields.uuid }).toArray();
+    const subField = Object.keys(fields)[0];
+    const filter = `${subField}.uuid`;
+    const existingDocument = await this.collection
+      .find({ [filter]: fields[subField].uuid })
+      .limit(1)
+      .size();
 
-    if (existingDocument.length) {
+    if (existingDocument) {
       throw new MongoDuplicateEntryError(
         `Cannot insert into ${this.collectionName}: UUID already exists.`,
       );
