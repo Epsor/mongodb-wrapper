@@ -49,11 +49,13 @@ describe('mongoCollectionWrapper', () => {
   describe('insertOne', () => {
     it('should retrieve an existing document', async () => {
       const document = { uuid: 'aaa', foo: 'bar' };
-      const toArrayMock = jest.fn(() => []);
+      const sizeMock = jest.fn(() => 0);
       const clientMock = {
         collection: jest.fn(() => ({
           find: jest.fn(() => ({
-            toArray: toArrayMock,
+            limit: jest.fn(() => ({
+              size: sizeMock,
+            })),
           })),
           insertOne: jest.fn(insertedDocument => [insertedDocument]),
         })),
@@ -63,7 +65,7 @@ describe('mongoCollectionWrapper', () => {
 
       await collection.insertOne(document);
 
-      expect(toArrayMock).toHaveBeenCalledTimes(1);
+      expect(sizeMock).toHaveBeenCalledTimes(1);
     });
 
     it('should throw an error upon inserting existing UUID', async () => {
@@ -72,6 +74,9 @@ describe('mongoCollectionWrapper', () => {
         collection: jest.fn(() => ({
           find: jest.fn(() => ({
             toArray: jest.fn(() => [document]),
+            limit: jest.fn(() => ({
+              size: jest.fn(() => 1),
+            })),
           })),
           insertOne: jest.fn(insertedDocument => [insertedDocument]),
         })),
@@ -115,6 +120,9 @@ describe('mongoCollectionWrapper', () => {
           collection: jest.fn(() => ({
             find: jest.fn(() => ({
               toArray: jest.fn(() => [document]),
+              limit: jest.fn(() => ({
+                size: jest.fn(() => 1),
+              })),
             })),
             findOneAndUpdate: jest.fn(() => ({
               value: null,
@@ -135,13 +143,17 @@ describe('mongoCollectionWrapper', () => {
           uuid: 'aaa',
           foo: [{ uuid: 'bbb', name: 'bar' }, { uuid: 'ccc', name: 'bar' }],
         };
+        const sizeMock = jest.fn(() => 0);
         const clientMock = {
           collection: jest.fn(() => ({
             find: jest.fn(() => ({
               toArray: jest.fn(() => []),
+              limit: jest.fn(() => ({
+                size: sizeMock,
+              })),
             })),
             findOneAndUpdate: jest.fn(() => ({
-              value: null,
+              value: { foo: { uuid: 'bbb', name: 'bar' } },
             })),
           })),
         };
@@ -151,7 +163,8 @@ describe('mongoCollectionWrapper', () => {
           await collection.safeInsertSubfields(document, { foo: { uuid: 'bbb', name: 'bar' } });
         };
 
-        expect(update()).rejects.toThrow(MongoDuplicateEntryError);
+        await update();
+        expect(sizeMock).toHaveBeenCalledTimes(1);
       });
     });
 
