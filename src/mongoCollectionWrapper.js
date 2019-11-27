@@ -36,9 +36,12 @@ export default class MongoCollectionWrapper {
    * @returns {Promise} - Promise of insertion
    */
   async insertOne({ uuid, ...fields }) {
-    const existingDocument = await this.collection.find({ uuid }).toArray();
+    const alreadyExistingDocumentCount = await this.collection
+      .find({ uuid })
+      .limit(1)
+      .size();
 
-    if (existingDocument.length) {
+    if (alreadyExistingDocumentCount) {
       throw new MongoDuplicateEntryError(
         `Cannot insert into ${this.collectionName}: UUID already exists.`,
       );
@@ -76,12 +79,12 @@ export default class MongoCollectionWrapper {
   async safeInsertSubfields(filters, fields) {
     const subField = Object.keys(fields)[0];
     const filter = `${subField}.uuid`;
-    const existingDocument = await this.collection
+    const alreadyExistingDocumentCount = await this.collection
       .find({ [filter]: fields[subField].uuid })
       .limit(1)
       .size();
 
-    if (existingDocument) {
+    if (alreadyExistingDocumentCount) {
       throw new MongoDuplicateEntryError(
         `Cannot insert into ${this.collectionName}: UUID already exists.`,
       );
