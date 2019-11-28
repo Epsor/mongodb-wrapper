@@ -39,7 +39,7 @@ export default class MongoCollectionWrapper {
     const alreadyExistingDocumentCount = await this.collection
       .find({ uuid })
       .limit(1)
-      .size();
+      .count();
 
     if (alreadyExistingDocumentCount) {
       throw new MongoDuplicateEntryError(
@@ -82,7 +82,7 @@ export default class MongoCollectionWrapper {
     const alreadyExistingDocumentCount = await this.collection
       .find({ [filter]: fields[subField].uuid })
       .limit(1)
-      .size();
+      .count();
 
     if (alreadyExistingDocumentCount) {
       throw new MongoDuplicateEntryError(
