@@ -1,6 +1,6 @@
 {
   "name": "@epsor/mongodb-wrapper",
-  "version": "2.1.7",
+  "version": "2.1.8",
   "description": "Mongodb wrapper",
   "main": "dist/index.js",
   "scripts": {
