@@ -49,12 +49,12 @@ describe('mongoCollectionWrapper', () => {
   describe('insertOne', () => {
     it('should retrieve an existing document', async () => {
       const document = { uuid: 'aaa', foo: 'bar' };
-      const sizeMock = jest.fn(() => 0);
+      const countMock = jest.fn(() => 0);
       const clientMock = {
         collection: jest.fn(() => ({
           find: jest.fn(() => ({
             limit: jest.fn(() => ({
-              size: sizeMock,
+              count: countMock,
             })),
           })),
           insertOne: jest.fn(insertedDocument => [insertedDocument]),
@@ -65,7 +65,7 @@ describe('mongoCollectionWrapper', () => {
 
       await collection.insertOne(document);
 
-      expect(sizeMock).toHaveBeenCalledTimes(1);
+      expect(countMock).toHaveBeenCalledTimes(1);
     });
 
     it('should throw an error upon inserting existing UUID', async () => {
@@ -73,9 +73,8 @@ describe('mongoCollectionWrapper', () => {
       const clientMock = {
         collection: jest.fn(() => ({
           find: jest.fn(() => ({
-            toArray: jest.fn(() => [document]),
             limit: jest.fn(() => ({
-              size: jest.fn(() => 1),
+              count: jest.fn(() => 1),
             })),
           })),
           insertOne: jest.fn(insertedDocument => [insertedDocument]),
@@ -119,9 +118,8 @@ describe('mongoCollectionWrapper', () => {
         const clientMock = {
           collection: jest.fn(() => ({
             find: jest.fn(() => ({
-              toArray: jest.fn(() => [document]),
               limit: jest.fn(() => ({
-                size: jest.fn(() => 1),
+                count: jest.fn(() => 1),
               })),
             })),
             findOneAndUpdate: jest.fn(() => ({
@@ -143,13 +141,12 @@ describe('mongoCollectionWrapper', () => {
           uuid: 'aaa',
           foo: [{ uuid: 'bbb', name: 'bar' }, { uuid: 'ccc', name: 'bar' }],
         };
-        const sizeMock = jest.fn(() => 0);
+        const countMock = jest.fn(() => 0);
         const clientMock = {
           collection: jest.fn(() => ({
             find: jest.fn(() => ({
-              toArray: jest.fn(() => []),
               limit: jest.fn(() => ({
-                size: sizeMock,
+                count: countMock,
               })),
             })),
             findOneAndUpdate: jest.fn(() => ({
@@ -164,7 +161,7 @@ describe('mongoCollectionWrapper', () => {
         };
 
         await update();
-        expect(sizeMock).toHaveBeenCalledTimes(1);
+        expect(countMock).toHaveBeenCalledTimes(1);
       });
     });
 
